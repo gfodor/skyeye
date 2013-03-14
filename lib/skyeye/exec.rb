@@ -12,7 +12,14 @@ module SkyEye
     end
 
     def go(*args)
-      @config = YAML.load(ENV["SKYEYE_CONFIG_FILE"] || "/etc/skyeye.yml")
+      config_file = ENV["SKYEYE_CONFIG_FILE"] || "/etc/skyeye.yml"
+
+      unless File.exists?(config_file)
+        puts "Missing #{config_file}. You can set the path to this file by exporting SKYEYE_CONFIG_FILE."
+        return
+      end
+
+      @config = YAML.load(config_file)
       @logger = Logger.new(STDOUT)
       @mutex = Mutex.new
 
@@ -34,13 +41,13 @@ module SkyEye
     end
 
     def deregister_instance_alarms!
-      deregister_alarms_matching!(/^sauron::instance::#{instance_id}::/)
+      deregister_alarms_matching!(/^skyeye::instance::#{instance_id}::/)
     end
 
     def deregister_aws_alarms!
       @config[:watches].keys.each do |resource_type|
         unless resource_type == :instance
-          deregister_alarms_matching!(/^sauron::#{resource_type}::/)
+          deregister_alarms_matching!(/^skyeye::#{resource_type}::/)
         end
       end
     end
@@ -129,7 +136,7 @@ module SkyEye
         @config[:watches][resource_type].each do |watch|
           [:warning, :critical].each do |threshold|
             target = dimension_value.map { |v| v[:value] }.join("_")
-            alarm_name = "sauron::#{resource_type}::#{target}::#{watch[:name]}-#{threshold}"
+            alarm_name = "skyeye::#{resource_type}::#{target}::#{watch[:name]}-#{threshold}"
 
             alarm = cw.alarms[alarm_name]
 
@@ -152,7 +159,7 @@ module SkyEye
                   insufficient_data_actions: (threshold == :critical && is_command ? @config[:arns] : []),
                   actions_enabled: true,
                   alarm_actions: @config[:arns],
-                  alarm_description: "sauron: #{watch.to_json}",
+                  alarm_description: "skyeye: #{watch.to_json}",
                 })
               end
             end
@@ -163,9 +170,9 @@ module SkyEye
 
     def start!
       @running = true
-      @logger.info "Sauron starting."
+      @logger.info "SkyEye starting."
 
-      namespace = @config[:namespace] || "sauron"
+      namespace = @config[:namespace] || "skyeye"
 
       @threads = @config[:watches][:instance].map do |w|
         thread_for_watch(namespace, w)
@@ -272,7 +279,7 @@ module SkyEye
 
       arns = []
 
-      (@config[:topics] || ["sauron-alerts"]).each do |topic_name|
+      (@config[:topics] || ["skyeye-alerts"]).each do |topic_name|
         current_topic = current_topics[:topics].find do |topic|
           topic[:topic_arn].split(/:/)[-1] == topic_name
         end
