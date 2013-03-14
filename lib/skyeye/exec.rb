@@ -12,7 +12,7 @@ module SkyEye
     end
 
     def go(*args)
-      @config = YAML.load(File.read(File.dirname(__FILE__) + "/../config/sauron.yml"))
+      @config = YAML.load(ENV["SKYEYE_CONFIG_FILE"] || "/etc/skyeye.yml")
       @logger = Logger.new(STDOUT)
       @mutex = Mutex.new
 

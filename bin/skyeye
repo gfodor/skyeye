@@ -3,7 +3,7 @@
 $: << File.dirname(__FILE__) + "/../lib"
 
 require "aws-sdk"
-require "exec"
+require "skyeye"
 
 @exec = SkyEye::Exec.new
 
