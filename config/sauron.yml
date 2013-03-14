@@ -8,8 +8,41 @@
   :critical: 1
 
 :watches:
-  - :name: sauron-heartbeat
-    :type: heartbeat
-  - :name: posto-mysql
-    :type: command
-    :command: /usr/local/sbin/check_tcp -H localhost -p 3306
+  :instance:
+    - :name: posto-mysql
+      :command: /usr/local/sbin/check_tcp -H localhost -p 3306
+      :interval: 5
+    - :name: CPUUtilization
+      :comparison_operator: GreaterThanThreshold
+      :warning: 50
+      :critical: 80
+  :elb:
+    - :name: HealthyHostCount
+      :comparison_operator: LessThanThreshold
+      :warning: 2
+      :critical: 1
+      :statistic: Minimum
+      :period: 1
+  :rds:
+    - :name: CPUUtilization
+      :comparison_operator: GreaterThanThreshold
+      :warning: 50
+      :critical: 80
+      :statistic: Average
+      :period: 2
+    - :name: DatabaseConnections
+      :comparison_operator: GreaterThanThreshold
+      :critical: 128
+      :statistic: Maximum
+      :period: 1
+  :elasticache:
+    - :name: CmdGet
+      :comparison_operator: GreaterThanThreshold
+      :critical: 6000
+      :period: 1
+    - :name: SwapUsage
+      :comparison_operator: GreaterThanThreshold
+      :critical: 0
+      :statistic: Minimum
+      :period: 5
+
