@@ -1,0 +1,15 @@
+:namespace: posto-dev
+
+:topics: 
+  - posto-sauron-alerts
+
+:alarm_periods:
+  :warning: 5
+  :critical: 1
+
+:watches:
+  - :name: sauron-heartbeat
+    :type: heartbeat
+  - :name: posto-mysql
+    :type: command
+    :command: /usr/local/sbin/check_tcp -H localhost -p 3306

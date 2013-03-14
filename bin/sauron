@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+$: << File.dirname(__FILE__) + "/../lib"
+
+require "aws-sdk"
+require "exec"
+
+@exec = Exec.new
+
+trap("INT") do
+  @exec.shutdown!
+end
+
+trap("TERM") do
+  @exec.shutdown!
+end
+
+@exec.go(*ARGV)
+
