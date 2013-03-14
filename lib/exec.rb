@@ -3,7 +3,7 @@ require "pp"
 require "json"
 require "open4"
 
-module Sauron
+module SkyEye
   class Exec
     attr_accessor :config
 
