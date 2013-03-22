@@ -16,6 +16,7 @@
       :comparison_operator: GreaterThanThreshold
       :warning: 50
       :critical: 80
+      :type: aws
   :elb:
     - :name: HealthyHostCount
       :comparison_operator: LessThanThreshold

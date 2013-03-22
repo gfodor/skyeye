@@ -200,7 +200,7 @@ module SkyEye
       Thread.new do 
         last_check = nil
 
-        interval = watch[:interval] || 5
+        interval = (watch[:interval] || 5) * 60
         cw = AWS::CloudWatch.new.client
 
         do_check = lambda do |&block|
