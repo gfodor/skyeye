@@ -201,7 +201,6 @@ module SkyEye
         last_check = nil
 
         interval = (watch[:interval] || 5) * 60
-        cw = AWS::CloudWatch.new.client
 
         do_check = lambda do |&block|
           if !last_check || (Time.now - last_check > interval)
@@ -242,18 +241,22 @@ module SkyEye
                   @logger.warn message
                 end
 
-                cw.put_metric_data({
-                  namespace: namespace,
-                  metric_data: [{
-                    metric_name: watch[:name],
-                    dimensions: [{
-                      :name => "InstanceId",
-                      :value => instance_id
-                    }],
-                    value: status.exitstatus,
-                    unit: "None"
-                  }]
-                })
+                @mutex.synchronize do
+                  cw = AWS::CloudWatch.new.client
+
+                  cw.put_metric_data({
+                    namespace: namespace,
+                    metric_data: [{
+                      metric_name: watch[:name],
+                      dimensions: [{
+                        :name => "InstanceId",
+                        :value => instance_id
+                      }],
+                      value: status.exitstatus,
+                      unit: "None"
+                    }]
+                  })
+                end
               else
                 raise "Missing command or aws id for watch #{watch[:name]}"
               end
