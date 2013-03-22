@@ -20,7 +20,7 @@ module SkyEye
         return
       end
 
-      @config = YAML.load(config_file)
+      @config = YAML.load(File.read(config_file))
       @logger = Logger.new(STDOUT)
       @mutex = Mutex.new
 
@@ -37,7 +37,7 @@ module SkyEye
         load_or_register_topics!
         register_aws_alarms!
       else
-        puts "unknown command #{args[0]}"
+        puts "valid commands: [de]register:(aws|instance)"
       end
     end
 
