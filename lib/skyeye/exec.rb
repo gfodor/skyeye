@@ -2,13 +2,14 @@ require "logger"
 require "pp"
 require "json"
 require "open4"
+require "open-uri"
 
 module SkyEye
   class Exec
     attr_accessor :config
 
     def instance_id
-      "i-d3b842a1"
+      @instance_id ||= open("http://169.254.169.254/latest/meta-data/instance-id").read
     end
 
     def go(*args)
