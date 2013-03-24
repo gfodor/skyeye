@@ -227,7 +227,7 @@ module SkyEye
                 message = nil
 
                 status = Open4::popen4(command) do |pid, stdin, stdout, stderr|
-                  message = "#{watch[:name]} :: #{stdout.readlines.join(" ").gsub(/\n/, " ").chomp}"
+                  message = "#{watch[:name]} :: #{stdout.readlines.join(" ").gsub(/\n/, " ").chomp} :: #{stderr.readlines.join(" ").gsub(/\n/, " ").chomp}"
                 end
 
                 case status
