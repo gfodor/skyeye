@@ -225,23 +225,24 @@ module SkyEye
               if watch[:command]
                 command = watch[:command]
                 message = nil
-
-                status = Open4::popen4(command) do |pid, stdin, stdout, stderr|
-                  message = "#{watch[:name]} :: #{stdout.readlines.join(" ").gsub(/\n/, " ").chomp} :: #{stderr.readlines.join(" ").gsub(/\n/, " ").chomp}"
-                end
-
-                case status
-                when 0
-                  @logger.info message
-                when 1
-                  @logger.warn message
-                when 2
-                  @logger.error message
-                else
-                  @logger.warn message
-                end
+                status = nil
 
                 @mutex.synchronize do
+                  status = Open4::popen4(command) do |pid, stdin, stdout, stderr|
+                    message = "#{watch[:name]} :: #{stdout.readlines.join(" ").gsub(/\n/, " ").chomp} :: #{stderr.readlines.join(" ").gsub(/\n/, " ").chomp}"
+                  end
+
+                  case status
+                  when 0
+                    @logger.info message
+                  when 1
+                    @logger.warn message
+                  when 2
+                    @logger.error message
+                  else
+                    @logger.warn message
+                  end
+
                   cw = AWS::CloudWatch.new.client
 
                   cw.put_metric_data({
